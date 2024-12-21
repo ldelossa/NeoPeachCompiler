@@ -1,0 +1,93 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-g",
+      "-c",
+      "-o",
+      "src/compiler.o",
+      "src/compiler.c"
+    ],
+    "directory": "/home/louis/git/c/NeoPeachCompiler",
+    "file": "/home/louis/git/c/NeoPeachCompiler/src/compiler.c",
+    "output": "/home/louis/git/c/NeoPeachCompiler/src/compiler.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-g",
+      "-c",
+      "-o",
+      "src/lexer.o",
+      "src/lexer.c"
+    ],
+    "directory": "/home/louis/git/c/NeoPeachCompiler",
+    "file": "/home/louis/git/c/NeoPeachCompiler/src/lexer.c",
+    "output": "/home/louis/git/c/NeoPeachCompiler/src/lexer.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-g",
+      "-c",
+      "-o",
+      "src/lexer_token.o",
+      "src/lexer_token.c"
+    ],
+    "directory": "/home/louis/git/c/NeoPeachCompiler",
+    "file": "/home/louis/git/c/NeoPeachCompiler/src/lexer_token.c",
+    "output": "/home/louis/git/c/NeoPeachCompiler/src/lexer_token.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-g",
+      "-c",
+      "-o",
+      "src/lexer_tokens.o",
+      "src/lexer_tokens.c"
+    ],
+    "directory": "/home/louis/git/c/NeoPeachCompiler",
+    "file": "/home/louis/git/c/NeoPeachCompiler/src/lexer_tokens.c",
+    "output": "/home/louis/git/c/NeoPeachCompiler/src/lexer_tokens.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-g",
+      "-c",
+      "-o",
+      "src/main.o",
+      "src/main.c"
+    ],
+    "directory": "/home/louis/git/c/NeoPeachCompiler",
+    "file": "/home/louis/git/c/NeoPeachCompiler/src/main.c",
+    "output": "/home/louis/git/c/NeoPeachCompiler/src/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-g",
+      "-c",
+      "-o",
+      "helpers/buffer.o",
+      "helpers/buffer.c"
+    ],
+    "directory": "/home/louis/git/c/NeoPeachCompiler",
+    "file": "/home/louis/git/c/NeoPeachCompiler/helpers/buffer.c",
+    "output": "/home/louis/git/c/NeoPeachCompiler/helpers/buffer.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-g",
+      "-c",
+      "-o",
+      "helpers/vector.o",
+      "helpers/vector.c"
+    ],
+    "directory": "/home/louis/git/c/NeoPeachCompiler",
+    "file": "/home/louis/git/c/NeoPeachCompiler/helpers/vector.c",
+    "output": "/home/louis/git/c/NeoPeachCompiler/helpers/vector.o"
+  }
+]
