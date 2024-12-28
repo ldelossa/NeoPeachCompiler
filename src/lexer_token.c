@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -141,11 +142,33 @@ struct token *token_operator_create(struct lexer *l) {
 
 struct token *token_symbol_create(struct lexer *l) {
     struct token *tok = calloc(1, sizeof(struct token));
-	char c = lexer_next_char(l);
-	if (c == ')')
-		lexer_finish_expression(l);
+    char c = lexer_next_char(l);
+    if (c == ')') lexer_finish_expression(l);
 
-	tok->type = TOKEN_TYPE_SYMBOL;
-	tok->cval = c;
-	return tok;
+    tok->type = TOKEN_TYPE_SYMBOL;
+    tok->cval = c;
+    tok->pos = l->pos;
+    return tok;
+}
+
+struct token *token_identifier_create(struct lexer *l) {
+    struct token *tok = calloc(1, sizeof(struct token));
+    struct buffer *buf = buffer_create();
+
+    unsigned char c = lexer_peek_char(l);
+    while (isalnum(c) || c == '_') {
+        c = lexer_next_char(l);
+        buffer_write(buf, c);
+        c = lexer_peek_char(l);
+    }
+
+    char *token_str = calloc(buf->len, sizeof(char));
+    strcpy(token_str, buffer_ptr(buf));
+
+    tok->type = TOKEN_TYPE_IDENTIFIER;
+    tok->sval = token_str;
+    tok->pos = l->pos;
+
+    buffer_free(buf);
+    return tok;
 }

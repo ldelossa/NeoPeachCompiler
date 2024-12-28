@@ -1,5 +1,6 @@
 #include "lexer.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -89,6 +90,8 @@ struct lexer *lexer_create(struct compiler *c) {
     return l;
 };
 
+bool valid_identifier_char(char c) { return (isalpha(c) || c == '_'); }
+
 // peeks at the next char in the stream the lexer is parsing.
 // the char will indicate what token to create and if it does not we exit
 // our program with an unrecognized character error.
@@ -105,9 +108,9 @@ struct token *lexer_read_next_token(struct lexer *lexer) {
     OPERATOR_CASE_EXCLUDING_DIVISION:
         tok = token_operator_create(lexer);
         break;
-	SYMBOL_CASE:
-		tok = token_symbol_create(lexer);
-		break;
+    SYMBOL_CASE:
+        tok = token_symbol_create(lexer);
+        break;
     WHITESPACE_CASE:
         // handle white case scenario
         {
@@ -125,6 +128,9 @@ struct token *lexer_read_next_token(struct lexer *lexer) {
         // parsing done...
         return NULL;
     DEFAULT_CASE:
+        if (valid_identifier_char(c))
+            return tok = token_identifier_create(lexer);
+
         // we peeked at the char to find an unhandled token, so we need to
         // increment the lexers col to get the accurate col unknown token
         // is at

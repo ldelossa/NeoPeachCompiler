@@ -23,4 +23,12 @@ struct token *token_operator_create(struct lexer *l);
 // Lexer MUST be set to the first character of the symbol.
 struct token *token_symbol_create(struct lexer *l);
 
+struct token *token_keyword_create(struct lexer *l);
+
+// Creates a new token of type TOKEN_TYPE_IDENTIFIER
+// Lexer MUST be set to the first character of the identifier.
+// If the identifier is determined to be a keyword a TOKEN_TYPE_KEYWORD token
+// is returned.
+struct token *token_identifier_create(struct lexer *l);
+
 #endif  // PEACHTOKENS_H
