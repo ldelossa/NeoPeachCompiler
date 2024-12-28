@@ -19,4 +19,8 @@ struct token *token_string_create(struct lexer *l);
 // included file is returned.
 struct token *token_operator_create(struct lexer *l);
 
+// Creates a new token of type TOKEN_TYPE_SYMBOL
+// Lexer MUST be set to the first character of the symbol.
+struct token *token_symbol_create(struct lexer *l);
+
 #endif  // PEACHTOKENS_H

@@ -8,6 +8,7 @@
 enum lex_errors {
     LEXICAL_ANALYSIS_ALL_OK,
     LEXICAL_ANALYSIS_INVALID_JOINED_OPERATOR,
+	LEXICAL_ANALYSIS_INVALID_EXPR_CLOSE,
     LEXICAL_ANALYSIS_INPUT_ERROR
 };
 
@@ -68,6 +69,8 @@ int lexer_lex(struct lexer *lexer);
 void lexer_new_expression(struct lexer *lexer);
 // Informs the caller if the lexer is currently in an expression.
 bool lexer_in_expression(struct lexer *lexer);
+// Finishes the current expression.
+void lexer_finish_expression(struct lexer *lexer);
 
 // Returns the next character of the file stream the lexer is currently parsing,
 // moving the lexer to the next character in the stream.

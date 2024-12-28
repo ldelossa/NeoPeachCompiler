@@ -138,3 +138,14 @@ struct token *token_operator_create(struct lexer *l) {
 
     return tok;
 }
+
+struct token *token_symbol_create(struct lexer *l) {
+    struct token *tok = calloc(1, sizeof(struct token));
+	char c = lexer_next_char(l);
+	if (c == ')')
+		lexer_finish_expression(l);
+
+	tok->type = TOKEN_TYPE_SYMBOL;
+	tok->cval = c;
+	return tok;
+}

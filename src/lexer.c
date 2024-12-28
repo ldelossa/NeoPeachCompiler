@@ -16,6 +16,11 @@ void lex_error(struct lexer *lex, enum lex_errors e) {
         case LEXICAL_ANALYSIS_INVALID_JOINED_OPERATOR:
             printf("Invalid joined operator\n");
             break;
+        case LEXICAL_ANALYSIS_INVALID_EXPR_CLOSE:
+            printf(
+                "Invalid expression closure, did you close an expression that "
+                "was not opened?\n");
+            break;
         default:
             printf("Unknown error\n");
             break;
@@ -62,6 +67,16 @@ void lex_error(struct lexer *lex, enum lex_errors e) {
     case '.':                            \
     case '?'
 
+#define SYMBOL_CASE \
+    case '{':       \
+    case '}':       \
+    case ':':       \
+    case ';':       \
+    case '#':       \
+    case '\\':      \
+    case ')':       \
+    case ']'
+
 #define STRING_CASE case '"'
 
 #define EOF_CASE case EOF
@@ -74,6 +89,9 @@ struct lexer *lexer_create(struct compiler *c) {
     return l;
 };
 
+// peeks at the next char in the stream the lexer is parsing.
+// the char will indicate what token to create and if it does not we exit
+// our program with an unrecognized character error.
 struct token *lexer_read_next_token(struct lexer *lexer) {
     struct token *tok = NULL;
     signed char c = lexer_peek_char(lexer);
@@ -87,6 +105,9 @@ struct token *lexer_read_next_token(struct lexer *lexer) {
     OPERATOR_CASE_EXCLUDING_DIVISION:
         tok = token_operator_create(lexer);
         break;
+	SYMBOL_CASE:
+		tok = token_symbol_create(lexer);
+		break;
     WHITESPACE_CASE:
         // handle white case scenario
         {
@@ -134,6 +155,12 @@ void lexer_new_expression(struct lexer *lexer) {
 
 bool lexer_in_expression(struct lexer *lexer) {
     return lexer->current_expression_count > 0;
+}
+
+void lexer_finish_expression(struct lexer *lexer) {
+    lexer->current_expression_count--;
+    if (lexer->current_expression_count < 0)
+        lex_error(lexer, LEXICAL_ANALYSIS_INVALID_EXPR_CLOSE);
 }
 
 char lexer_next_char(struct lexer *lexer) {
