@@ -1,3 +1,5 @@
+#include "lexer_token.h"
+
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,6 +7,15 @@
 #include "../helpers/buffer.h"
 #include "../helpers/vector.h"
 #include "lexer.h"
+
+bool is_keyword(char *str) {
+    char **keyword = keywords;
+    while (*keyword) {
+        if (strcmp(str, *keyword) == 0) return true;
+        keyword++;
+    }
+    return false;
+}
 
 struct token *token_number_create(struct lexer *l) {
     struct token *tok = calloc(1, sizeof(struct token));
@@ -162,10 +173,17 @@ struct token *token_identifier_create(struct lexer *l) {
         c = lexer_peek_char(l);
     }
 
+    // add null byte
+    buffer_write(buf, '\0');
+
     char *token_str = calloc(buf->len, sizeof(char));
     strcpy(token_str, buffer_ptr(buf));
 
-    tok->type = TOKEN_TYPE_IDENTIFIER;
+    if (is_keyword(buffer_ptr(buf))) {
+        tok->type = TOKEN_TYPE_KEYWORD;
+    } else {
+        tok->type = TOKEN_TYPE_IDENTIFIER;
+    }
     tok->sval = token_str;
     tok->pos = l->pos;
 

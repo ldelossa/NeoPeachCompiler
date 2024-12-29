@@ -3,6 +3,40 @@
 
 #include "lexer.h"
 
+// NULL terminated list of valid keywords
+static char *keywords[] = {"unsigned",
+                           "signed",
+                           "char",
+                           "short",
+                           "int",
+                           "long",
+                           "float",
+                           "double",
+                           "void",
+                           "struct",
+                           "union",
+                           "static",
+                           "__ignore_typecheck",
+                           "return",
+                           "include",
+                           "sizeof",
+                           "if",
+                           "else",
+                           "while",
+                           "for",
+                           "do",
+                           "break",
+                           "continue",
+                           "switch",
+                           "case",
+                           "default",
+                           "goto",
+                           "typedef",
+                           "const",
+                           "extern",
+                           "restrict",
+                           NULL};
+
 // Creates a new token of type TOKEN_TYPE_NUMBER
 // Lexer MUST be set to the first character of the numeric token.
 struct token *token_number_create(struct lexer *l);
@@ -23,6 +57,8 @@ struct token *token_operator_create(struct lexer *l);
 // Lexer MUST be set to the first character of the symbol.
 struct token *token_symbol_create(struct lexer *l);
 
+// Creates a new token of type TOKEN_TYPE_KEYWORD
+// Lexer MUST be set to the first character of the keyword.
 struct token *token_keyword_create(struct lexer *l);
 
 // Creates a new token of type TOKEN_TYPE_IDENTIFIER
