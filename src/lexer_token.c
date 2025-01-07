@@ -190,3 +190,95 @@ struct token *token_identifier_create(struct lexer *l) {
     buffer_free(buf);
     return tok;
 }
+
+struct token *token_newline_create(struct lexer *l) {
+    lexer_next_char(l);
+    struct token *tok = calloc(1, sizeof(struct token));
+    tok->type = TOKEN_TYPE_NEWLINE;
+    tok->pos = l->pos;
+    return tok;
+}
+
+struct token *token_comment_create(struct lexer *l) {
+    // determine if we are a single line or a multiline comment
+    char comment = lexer_next_char(l);
+    struct buffer *buf = buffer_create();
+
+    switch (comment) {
+        case '/':
+            comment = lexer_next_char(l);
+            while (comment != '\n' && (signed char)comment != EOF) {
+                buffer_write(buf, comment);
+                comment = lexer_next_char(l);
+            }
+            break;
+        case '*':
+            comment = lexer_next_char(l);
+            while (comment != '*') {
+                if ((signed char)comment == EOF)
+                    lex_error(l, LEXICAL_ANALYSIS_MULTILINE_COMMENT_NOT_CLOSED);
+
+                char next_c = lexer_peek_char(l);
+                if (next_c == '/') {
+                    // discard end of comment
+                    lexer_next_char(l);
+                    break;
+                }
+
+                buffer_write(buf, comment);
+                comment = lexer_next_char(l);
+            }
+            break;
+        default:
+            lex_error(l, LEXICAL_ANALYSIS_INPUT_ERROR);
+    }
+
+    // add nul char
+    buffer_write(buf, '\0');
+
+    struct token *tok = calloc(1, sizeof(struct token));
+    tok->type = TOKEN_TYPE_COMMENT;
+    tok->sval = buffer_ptr(buf);
+    tok->pos = l->pos;
+
+    buffer_free(buf);
+    return tok;
+}
+
+struct token *token_quote_create(struct lexer *l) {
+    // discard first quote, we don't need it...
+    lexer_next_char(l);
+
+    char c = lexer_next_char(l);
+
+    // handle escapes
+    if (c == '\\') {
+        char escaped = lexer_next_char(l);
+        switch (escaped) {
+            case 'n':
+                c = '\n';
+                break;
+            case '\\':
+                c = '\\';
+                break;
+            case '\'':
+                c = '\'';
+                break;
+            case '\t':
+                c = '\t';
+                break;
+        }
+    }
+
+    // discard the paired quote
+    if (lexer_next_char(l) != '\'') {
+        lex_error(l, LEXICAL_ANALYSIS_QUOTE_NOT_CLOSED);
+    }
+
+    struct token *tok = calloc(1, sizeof(struct token));
+    tok->type = TOKEN_TYPE_NUMBER;
+    tok->pos = l->pos;
+    tok->cval = c;
+
+    return tok;
+}

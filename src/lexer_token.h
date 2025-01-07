@@ -67,4 +67,19 @@ struct token *token_keyword_create(struct lexer *l);
 // is returned.
 struct token *token_identifier_create(struct lexer *l);
 
+// Creates a new token of type TOKEN_TYPE_NEWLINE
+// Lexer MUST be set to the newline character.
+struct token *token_newline_create(struct lexer *l);
+
+// Creates a new token of type TOKEN_TYPE_COMMENT.
+// Lexer MUST be set to the SECOND character of the comment string, '/' or '*'
+// in the single line, '//', or the multiline, '/*' comment declaration,
+// respectively.
+struct token *token_comment_create(struct lexer *l);
+
+// Creates a new token of type TOKEN_TYPE_NUMBER representing the character
+// within a quote pair.
+// Lexer MUST be set to the first quote character.
+struct token *token_quote_create(struct lexer*l);
+
 #endif  // PEACHTOKENS_H

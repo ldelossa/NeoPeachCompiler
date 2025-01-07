@@ -22,6 +22,12 @@ void lex_error(struct lexer *lex, enum lex_errors e) {
                 "Invalid expression closure, did you close an expression that "
                 "was not opened?\n");
             break;
+        case LEXICAL_ANALYSIS_MULTILINE_COMMENT_NOT_CLOSED:
+            printf("Multiline comment not closed\n");
+            break;
+        case LEXICAL_ANALYSIS_QUOTE_NOT_CLOSED:
+            printf("Quote not closed\n");
+            break;
         default:
             printf("Unknown error\n");
             break;
@@ -47,25 +53,26 @@ void lex_error(struct lexer *lex, enum lex_errors e) {
 
 #define WHITESPACE_CASE \
     case ' ':           \
-    case '\n'
+    case '\t'
 
-#define OPERATOR_CASE_EXCLUDING_DIVISION \
-    case '+':                            \
-    case '-':                            \
-    case '*':                            \
-    case '>':                            \
-    case '<':                            \
-    case '^':                            \
-    case '%':                            \
-    case '!':                            \
-    case '=':                            \
-    case '~':                            \
-    case '|':                            \
-    case '&':                            \
-    case '(':                            \
-    case '[':                            \
-    case ',':                            \
-    case '.':                            \
+#define OPERATOR_OR_COMMENT_CASE \
+    case '+':                    \
+    case '-':                    \
+    case '*':                    \
+    case '>':                    \
+    case '<':                    \
+    case '^':                    \
+    case '%':                    \
+    case '!':                    \
+    case '=':                    \
+    case '~':                    \
+    case '|':                    \
+    case '&':                    \
+    case '(':                    \
+    case '[':                    \
+    case ',':                    \
+    case '.':                    \
+    case '/':                    \
     case '?'
 
 #define SYMBOL_CASE \
@@ -79,6 +86,12 @@ void lex_error(struct lexer *lex, enum lex_errors e) {
     case ']'
 
 #define STRING_CASE case '"'
+
+#define NEWLINE_CASE case '\n'
+
+#define COMMENT_CASE case '/'
+
+#define QUOTE_CASE case '\''
 
 #define EOF_CASE case EOF
 
@@ -105,24 +118,45 @@ struct token *lexer_read_next_token(struct lexer *lexer) {
     STRING_CASE:
         tok = token_string_create(lexer);
         break;
-    OPERATOR_CASE_EXCLUDING_DIVISION:
+    OPERATOR_OR_COMMENT_CASE: {
+        // handle '/' indicating a comment, not the division operator
+        if (c == '/') {
+            // discard the first '/' since we need to read the next char
+            lexer_next_char(lexer);
+            // peek at the next char, can be '/' and '*' if its a comment, any
+            // other value indicates its a division operator
+            char next_c = lexer_peek_char(lexer);
+            if (next_c == '/' || next_c == '*') {
+                tok = token_comment_create(lexer);
+                break;
+            }
+            // its not a comment, but we moved the lexer one past the original
+            // '/' operator, we push it back onto the stream, since
+            // `token_operator_create` expects the lexer to ready to read the
+            // current operator.
+            lexer_push_char(lexer, '/');
+        }
         tok = token_operator_create(lexer);
         break;
+    }
     SYMBOL_CASE:
         tok = token_symbol_create(lexer);
         break;
-    WHITESPACE_CASE:
-        // handle white case scenario
-        {
-            // last read token needs indication that white space was next
-            struct token *last_token = vector_back_or_null(lexer->token_vec);
-            last_token->whitespace = true;
-            // discard this token
-            lexer_next_char(lexer);
-            // recurse here so this function still returns the next token,
-            // if you return NULL here iteration would stop prematurely.
-            return lexer_read_next_token(lexer);
-        }
+    NEWLINE_CASE:
+        tok = token_newline_create(lexer);
+        break;
+    WHITESPACE_CASE: {
+        // last read token needs indication that white space was next
+        struct token *last_token = vector_back_or_null(lexer->token_vec);
+        last_token->whitespace = true;
+        // discard this token
+        lexer_next_char(lexer);
+        // recurse here so this function still returns the next token,
+        // if you return NULL here iteration would stop prematurely.
+        return lexer_read_next_token(lexer);
+    } break;
+    QUOTE_CASE:
+        tok = token_quote_create(lexer);
         break;
     EOF_CASE:
         // parsing done...
